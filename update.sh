@@ -1,16 +1,11 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-# Silent initial setup for visual tools
-if ! command -v figlet &> /dev/null || ! command -v lolcat &> /dev/null; then
-    apt-get update > /dev/null 2>&1
-    apt-get install figlet lolcat -y > /dev/null 2>&1
-fi
-
 show_menu() {
     clear
-    figlet -f slant "DARK TOOLBOX" | lolcat
     echo -e "\e[1;36m========================================================\e[0m"
-    echo -e "\e[1;32m  1.\e[0m Select Fast Mirror & Upgrade System"
+    echo -e "\e[1;35m                   DARK TOOLBOX\e[0m"
+    echo -e "\e[1;36m========================================================\e[0m"
+    echo -e "\e[1;32m  1.\e[0m Fix Play Store Repo & Upgrade System \e[1;31m(DO THIS FIRST)\e[0m"
     echo -e "\e[1;32m  2.\e[0m Install AI & Bot Toolkit (Node.js, Python, Git)"
     echo -e "\e[1;32m  3.\e[0m Setup PM2 (Run Node.js bots in the background)"
     echo -e "\e[1;32m  4.\e[0m Grant Android Storage Permissions"
@@ -39,17 +34,29 @@ while true; do
                 *) echo -e "\e[1;31mInvalid selection. Defaulting to Global CDN.\e[0m"; REPO_URL="https://packages.termux.dev/apt/termux-main" ;;
             esac
 
-            echo -e "\n\e[1;33m[*] Locking in mirror and bypassing dead Play Store repos...\e[0m"
+            echo -e "\n\e[1;33m[*] Hijacking dead Play Store repos...\e[0m"
             echo "deb $REPO_URL main" > $PREFIX/etc/apt/sources.list
             
-            apt-get update -o Acquire::AllowInsecureRepositories=true > /dev/null 2>&1
-            apt-get install termux-keyring -y --allow-unauthenticated > /dev/null 2>&1
+            # This is the magic that bypasses the broken Play Store security keys
+            apt-get update -o Acquire::AllowInsecureRepositories=true
+            apt-get install termux-keyring -y --allow-unauthenticated
             
-            echo -e "\e[1;32m[*] Pulling latest packages from selected mirror...\e[0m"
+            echo -e "\e[1;32m[*] Keys fixed! Now actually downloading the newest packages...\e[0m"
             apt-get update -y && apt-get upgrade -y
             
-            echo -e "\n\e[1;32m[✔] System updated lightning fast!\e[0m"
-            sleep 3
+            # Now that the internet works, we download the cool visual tools!
+            echo -e "\n\e[1;33m[*] Installing visual aesthetics...\e[0m"
+            apt-get install figlet lolcat -y > /dev/null 2>&1
+            
+            clear
+            if command -v figlet &> /dev/null && command -v lolcat &> /dev/null; then
+                figlet -f slant "UPDATED" | lolcat
+            else
+                echo -e "\e[1;32m[✔] SYSTEM UPDATED\e[0m"
+            fi
+            
+            echo -e "\n\e[1;32m[✔] Termux packages are now fully modern!\e[0m"
+            sleep 4
             ;;
         2)
             echo -e "\n\e[1;33m[*] Installing essential Android dev tools...\e[0m"
